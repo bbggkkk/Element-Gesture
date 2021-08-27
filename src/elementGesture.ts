@@ -48,13 +48,23 @@ distanceAll
 HTMLElement.prototype.gesture = function($event:any){
     //dragStart,drag,dragEnd
 
+    const eventMap:any = {
+        mousedown  : 'dragStart',
+        touchstart : 'dragStart',
+        mousemove  : 'drag',
+        touchmove  : 'drag',
+        mouseup    : 'dragEnd',
+        touchend   : 'dragEnd',
+    }
+
     const type:Array<string> = Object.keys($event);
     this.gestureData     = {};
 
-    type.forEach(item => {
+    // type.forEach(item => {
         this.addEventListener('mousedown',(event:MouseEvent) => {
             const mousemove = (event:MouseEvent) => {
                 requestAnimationFrame(() => {
+                    event.preventDefault();
 
                     const { clientX, clientY, movementX:moveX, movementY:moveY } = event;
 
@@ -66,7 +76,7 @@ HTMLElement.prototype.gesture = function($event:any){
                     
                     this.gestureData.drag = {
                         start       : this.gestureData.dragStart.start,
-                        offset      : this.gestureData.dragStart.offset,
+                        // offset      : this.gestureData.dragStart.offset,
                         distance    : [
                             distance1,
                             distance2,
@@ -90,21 +100,25 @@ HTMLElement.prototype.gesture = function($event:any){
                             moveX > 0 ? 1 : moveX < 0 ? -1 : 0,
                             moveY > 0 ? 1 : moveY < 0 ? -1 : 0
                         ],
-                        distanceAll : this.gestureData.drag ? this.gestureData.drag.distanceAll+move3 : 0
+                        distanceAll : this.gestureData.drag ? this.gestureData.drag.distanceAll+move3 : 0,
+                        type        : 'drag'
                     }         
                     
-                    if(item === 'drag'){
-                        $event[item](this.gestureData.drag,this,event);
+                    if(eventMap[event.type] === 'drag'){
+                        $event[eventMap[event.type]](this.gestureData.drag,this,event);
                     }
                 });
             }
             const mouseup = (event:MouseEvent) => {
+                event.preventDefault();
                 document.removeEventListener('mousemove',mousemove);   
                 document.removeEventListener('mouseup',mouseup); 
-                if(item === 'dragEnd'){
-                    $event[item](this.gestureData.drag,this,event);
+                if(eventMap[event.type] === 'dragEnd'){
+                    this.gestureData.dragEnd = this.gestureData.drag ? this.gestureData.drag : this.gestureData.dragStart;
+                    this.gestureData.dragEnd.type = 'dragEnd';
+                    $event[eventMap[event.type]](this.gestureData.dragEnd,this,event);
                 }
-                this.gestureData.drag.distanceAll = 0;
+                this.gestureData.drag && (this.gestureData.drag = undefined);
             }
             
             this.gestureData.dragStart = {
@@ -116,12 +130,16 @@ HTMLElement.prototype.gesture = function($event:any){
                 prePosition : [event.clientX,event.clientY],
                 speed       : [0,0,0],
                 direction   : [0,0],
-                distanceAll : 0
-            }                    
+                distanceAll : 0,
+                type        : 'dragStart'
+            }
 
+            if(eventMap[event.type] === 'dragStart'){
+                $event[eventMap[event.type]](this.gestureData.dragStart,this,event);
+            }
             document.addEventListener('mousemove',mousemove);   
             document.addEventListener('mouseup',mouseup);   
-        });
+        },true);
 
         this.addEventListener('touchstart',(event:TouchEvent) => {
             const touchmove = (event:TouchEvent) => {
@@ -141,7 +159,7 @@ HTMLElement.prototype.gesture = function($event:any){
                     
                     this.gestureData.drag = {
                         start       : this.gestureData.dragStart.start,
-                        offset      : this.gestureData.dragStart.offset,
+                        // offset      : this.gestureData.dragStart.offset,
                         distance    : [
                             distance1,
                             distance2,
@@ -165,11 +183,12 @@ HTMLElement.prototype.gesture = function($event:any){
                             moveX > 0 ? 1 : moveX < 0 ? -1 : 0,
                             moveY > 0 ? 1 : moveY < 0 ? -1 : 0
                         ],
-                        distanceAll : this.gestureData.drag ? this.gestureData.drag.distanceAll+move3 : 0
+                        distanceAll : this.gestureData.drag ? this.gestureData.drag.distanceAll+move3 : 0,
+                        type        : 'drag'
                     }         
                     
-                    if(item === 'drag'){
-                        $event[item](this.gestureData.drag,this,event);
+                    if(eventMap[event.type] === 'drag'){
+                        $event[eventMap[event.type]](this.gestureData.drag,this,event);
                     }
 
                 });
@@ -177,10 +196,12 @@ HTMLElement.prototype.gesture = function($event:any){
             const touchend = (event:TouchEvent) => {
                 document.removeEventListener('touchmove',touchmove);   
                 document.removeEventListener('touchend',touchend);   
-                if(item === 'dragEnd'){
-                    $event[item](this.gestureData.drag,this,event);
+                if(eventMap[event.type] === 'dragEnd'){
+                    this.gestureData.dragEnd = this.gestureData.drag ? this.gestureData.drag : this.gestureData.dragStart;
+                    this.gestureData.dragEnd.type = 'dragEnd';
+                    $event[eventMap[event.type]](this.gestureData.dragEnd,this,event);
                 }
-                this.gestureData.drag.distanceAll = 0;
+                this.gestureData.drag && (this.gestureData.drag = undefined);
 
             }
 
@@ -197,12 +218,16 @@ HTMLElement.prototype.gesture = function($event:any){
                 prePosition : [clientX,clientY],
                 speed       : [0,0,0],
                 direction   : [0,0],
-                distanceAll : 0
+                distanceAll : 0,
+                type        : 'dragStart'
             }        
 
+            if(eventMap[event.type] === 'dragStart'){
+                $event[eventMap[event.type]](this.gestureData.dragStart,this,event);
+            }
             document.addEventListener('touchmove',touchmove);   
             document.addEventListener('touchend',touchend);   
         });
-    });
+    // });
 
 }

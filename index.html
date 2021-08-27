@@ -6,14 +6,124 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Element-Gesture</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --main : #1167bd;
+        }
         *           { box-sizing:border-box; margin:0; padding:0; }
-        html,body   { width:100%; height:100%; }
+        html,body   { width:100%; height:100%; background:#1a1a1a; }
+        body        { font-family:'Noto Sans KR', sans-serif; }
+        .box        {
+            border-radius:24px;
+            padding:24px;
+            box-shadow: 0 8px 16px rgba(0,0,0,.3);
+        }
+
+        #box        {
+            width:200px;
+            height:200px;
+            border:1px solid rgba(255,255,255,0.3);
+            background:var(--main);
+            position:absolute;
+            top:50%; left:50%;
+            transform:translate(-50%,-50%);
+        }
+
+        #monitor    {
+            position:absolute;
+            bottom:48px;
+            right:48px;
+            background:#333;
+            width:calc(100% - 96px);
+        }
+
+        table {
+            width:100%;
+            color:white;
+            border-spacing:0;
+        }
+        table th, table td {
+            width:25%;
+            text-align:center;
+            padding:8px 12px;
+            border-bottom:1px solid rgba(255,255,255,0.1);
+        }
+        table tr:hover td {
+            background:rgba(255,255,255,0.1);
+        }
     </style>
 </head>
 <body>
-    <div id='box' style='width:200px; height:200px; background:#1167bd; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);'></div>
+    <div id='box' class='box'></div>
 
+
+    <div id='monitor' class='box'>
+        <table>
+            <thead>
+                <tr>
+                    <th>name</th>
+                    <th>value - X</th>
+                    <th>value - Y</th>
+                    <th>value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="type">
+                    <td class="vname">type</td>
+                    <td class="v1" colspan="3"></td>
+                </tr>
+                <tr class="start">
+                    <td class="vname">start</td>
+                    <td class="v1"></td>
+                    <td class="v2"></td>
+                    <td class="v3"></td>
+                </tr>
+                <tr class="direction">
+                    <td class="vname">direction</td>
+                    <td class="v1"></td>
+                    <td class="v2"></td>
+                    <td class="v3"></td>
+                </tr>
+                <tr class="move">
+                    <td class="vname">move</td>
+                    <td class="v1"></td>
+                    <td class="v2"></td>
+                    <td class="v3"></td>
+                </tr>
+                <tr class="position">
+                    <td class="vname">position</td>
+                    <td class="v1"></td>
+                    <td class="v2"></td>
+                    <td class="v3"></td>
+                </tr>
+                <tr class="prePosition">
+                    <td class="vname">prePosition</td>
+                    <td class="v1"></td>
+                    <td class="v2"></td>
+                    <td class="v3"></td>
+                </tr>
+                <tr class="speed">
+                    <td class="vname">speed</td>
+                    <td class="v1"></td>
+                    <td class="v2"></td>
+                    <td class="v3"></td>
+                </tr>
+                <tr class="distance">
+                    <td class="vname">distance</td>
+                    <td class="v1"></td>
+                    <td class="v2"></td>
+                    <td class="v3"></td>
+                </tr>
+                <tr class="distanceAll">
+                    <td class="vname">distanceAll</td>
+                    <td class="v1" colspan="3"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
     <script src='/dist/main.js'></script>
 </body>
