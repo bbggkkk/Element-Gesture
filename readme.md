@@ -49,6 +49,6 @@ parameter는 다음과같은 값을 반환합니다.
 
 
 ## 사용하기
-- [데모페이지](https://bbggkkk.github.io/Element-Gesture/)
-- [타입스크립트](https://github.com/bbggkkk/Element-Gesture/blob/master/src/elementGesture.ts)
-- [자바스크립트](https://github.com/bbggkkk/Element-Gesture/blob/master/dist/elementGesture.js)
+- [데모페이지](https://bbggkkk.github.io/Element-Gesture/){:target="_blank"}
+- [타입스크립트](https://github.com/bbggkkk/Element-Gesture/blob/master/src/elementGesture.ts){:target="_blank"}
+- [자바스크립트](https://github.com/bbggkkk/Element-Gesture/blob/master/dist/elementGesture.js){:target="_blank"}
