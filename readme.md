@@ -42,7 +42,6 @@ parameter는 다음과같은 값을 반환합니다.
 |**move**|이번 틱에 이동한 거리|`array`| `[x, y, total]` |
 |**position**|현재 포인터의 위치|`array`| `[x, y]` |
 |**prePosition**|이전 포인터의 위치|`array`| `[x, y]` |
-|**speed**|드래그 속도|`array`| `[x, y, total]` |
 |**distance**|시작점으로부터의 이동 거리|`array`| `[x, y, total]` |
 |**distanceAll**|시작점으로부터의 현재까지 이동한 총 거리|`number`||
 
