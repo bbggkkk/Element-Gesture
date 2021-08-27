@@ -95,7 +95,6 @@ HTMLElement.prototype.gesture = function($event:any){
                             clientX,
                             clientY
                         ],
-                        speed       : [0,0,0],
                         direction   : [
                             moveX > 0 ? 1 : moveX < 0 ? -1 : 0,
                             moveY > 0 ? 1 : moveY < 0 ? -1 : 0
@@ -128,7 +127,6 @@ HTMLElement.prototype.gesture = function($event:any){
                 move        : [0,0,0],
                 position    : [event.clientX,event.clientY],
                 prePosition : [event.clientX,event.clientY],
-                speed       : [0,0,0],
                 direction   : [0,0],
                 distanceAll : 0,
                 type        : 'dragStart'
@@ -178,7 +176,6 @@ HTMLElement.prototype.gesture = function($event:any){
                             clientX,
                             clientY
                         ],
-                        speed       : [0,0,0],
                         direction   : [
                             moveX > 0 ? 1 : moveX < 0 ? -1 : 0,
                             moveY > 0 ? 1 : moveY < 0 ? -1 : 0
@@ -216,7 +213,6 @@ HTMLElement.prototype.gesture = function($event:any){
                 move        : [0,0,0],
                 position    : [clientX,clientY],
                 prePosition : [clientX,clientY],
-                speed       : [0,0,0],
                 direction   : [0,0],
                 distanceAll : 0,
                 type        : 'dragStart'
