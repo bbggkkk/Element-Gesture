@@ -46,3 +46,9 @@ parameter는 다음과같은 값을 반환합니다.
 |**speed**|드래그 속도|`array`| `[x, y, total]` |
 |**distance**|시작점으로부터의 이동 거리|`array`| `[x, y, total]` |
 |**distanceAll**|시작점으로부터의 현재까지 이동한 총 거리|`number`||
+
+
+## 사용하기
+- [데모페이지](https://bbggkkk.github.io/Element-Gesture/)
+- [타입스크립트](https://github.com/bbggkkk/Element-Gesture/blob/master/src/elementGesture.ts)
+- [자바스크립트](https://github.com/bbggkkk/Element-Gesture/blob/master/dist/elementGesture.js)
