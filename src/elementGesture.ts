@@ -8,7 +8,9 @@ interface Element {
     gestureData:any;
 }
 interface gestureData {
+    dragStart:Object;
     drag:Object;
+    dragEnd:Object;
 }
 
 /**
@@ -103,7 +105,7 @@ HTMLElement.prototype.gesture = function($event:any){
                         type        : 'drag'
                     }         
                     
-                    if(eventMap[event.type] === 'drag'){
+                    if($event[eventMap[event.type]] && eventMap[event.type] === 'drag'){
                         $event[eventMap[event.type]](this.gestureData.drag,this,event);
                     }
                 });
@@ -112,7 +114,7 @@ HTMLElement.prototype.gesture = function($event:any){
                 event.preventDefault();
                 document.removeEventListener('mousemove',mousemove);   
                 document.removeEventListener('mouseup',mouseup); 
-                if(eventMap[event.type] === 'dragEnd'){
+                if($event[eventMap[event.type]] && eventMap[event.type] === 'dragEnd'){
                     this.gestureData.dragEnd = this.gestureData.drag ? this.gestureData.drag : this.gestureData.dragStart;
                     this.gestureData.dragEnd.type = 'dragEnd';
                     $event[eventMap[event.type]](this.gestureData.dragEnd,this,event);
@@ -132,7 +134,7 @@ HTMLElement.prototype.gesture = function($event:any){
                 type        : 'dragStart'
             }
 
-            if(eventMap[event.type] === 'dragStart'){
+            if($event[eventMap[event.type]] && eventMap[event.type] === 'dragStart'){
                 $event[eventMap[event.type]](this.gestureData.dragStart,this,event);
             }
             document.addEventListener('mousemove',mousemove);   
@@ -184,7 +186,7 @@ HTMLElement.prototype.gesture = function($event:any){
                         type        : 'drag'
                     }         
                     
-                    if(eventMap[event.type] === 'drag'){
+                    if($event[eventMap[event.type]] && eventMap[event.type] === 'drag'){
                         $event[eventMap[event.type]](this.gestureData.drag,this,event);
                     }
 
@@ -193,7 +195,7 @@ HTMLElement.prototype.gesture = function($event:any){
             const touchend = (event:TouchEvent) => {
                 document.removeEventListener('touchmove',touchmove);   
                 document.removeEventListener('touchend',touchend);   
-                if(eventMap[event.type] === 'dragEnd'){
+                if($event[eventMap[event.type]] && eventMap[event.type] === 'dragEnd'){
                     this.gestureData.dragEnd = this.gestureData.drag ? this.gestureData.drag : this.gestureData.dragStart;
                     this.gestureData.dragEnd.type = 'dragEnd';
                     $event[eventMap[event.type]](this.gestureData.dragEnd,this,event);
@@ -218,7 +220,7 @@ HTMLElement.prototype.gesture = function($event:any){
                 type        : 'dragStart'
             }        
 
-            if(eventMap[event.type] === 'dragStart'){
+            if($event[eventMap[event.type]] && eventMap[event.type] === 'dragStart'){
                 $event[eventMap[event.type]](this.gestureData.dragStart,this,event);
             }
             document.addEventListener('touchmove',touchmove);   
