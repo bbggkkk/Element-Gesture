@@ -148,8 +148,8 @@ HTMLElement.prototype.gesture = function($event:any){
 
                     const clientX = event.touches[0].clientX;
                     const clientY = event.touches[0].clientY;
-                    const moveX   = this.gestureData.drag ? clientX - this.gestureData.drag.prePosition[0] : 0
-                    const moveY   = this.gestureData.drag ? clientY - this.gestureData.drag.prePosition[1] : 0
+                    const moveX   = this.gestureData.drag ? clientX - this.gestureData.drag.position[0] : 0
+                    const moveY   = this.gestureData.drag ? clientY - this.gestureData.drag.position[1] : 0
 
                     const distance1 = clientX - this.gestureData.dragStart.start[0];
                     const distance2 = clientY - this.gestureData.dragStart.start[1];
