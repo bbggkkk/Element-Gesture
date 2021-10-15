@@ -234,7 +234,6 @@ HTMLElement.prototype.gesture = function($event:any){
     }
 
     this.addEventListener('mousedown', md, { passive:true });
-
     this.addEventListener('touchstart', td, { passive:true });
 
 }

@@ -1,1 +1,276 @@
-(()=>{"use strict";var t,e,a,r={232:()=>{HTMLElement.prototype.gesture=function(t){var e=this,a={mousedown:"dragStart",touchstart:"dragStart",mousemove:"drag",touchmove:"drag",mouseup:"dragEnd",touchend:"dragEnd"};Object.keys(t),this.gestureData={};var r=function(r){var s=function(r){requestAnimationFrame((function(){var s=r.clientX,n=r.clientY,d=r.movementX,o=r.movementY,g=s-e.gestureData.dragStart.start[0],u=n-e.gestureData.dragStart.start[1],i=Math.sqrt(Math.abs(g*g)+Math.abs(u*u)),c=Math.sqrt(Math.abs(d*d)+Math.abs(o*o));e.gestureData.drag={start:e.gestureData.dragStart.start,distance:[g,u,i],move:[d,o,c],prePosition:[e.gestureData.drag?e.gestureData.drag.position[0]:s,e.gestureData.drag?e.gestureData.drag.position[1]:n],position:[s,n],direction:[d>0?1:d<0?-1:0,o>0?1:o<0?-1:0],distanceAll:e.gestureData.drag?e.gestureData.drag.distanceAll+c:0,type:"drag"},t[a[r.type]]&&"drag"===a[r.type]&&t[a[r.type]](e.gestureData.drag,e,r)}))},n=function(r){document.removeEventListener("mousemove",s),document.removeEventListener("mouseup",n),t[a[r.type]]&&"dragEnd"===a[r.type]&&(e.gestureData.dragEnd=e.gestureData.drag?e.gestureData.drag:e.gestureData.dragStart,e.gestureData.dragEnd.type="dragEnd",t[a[r.type]](e.gestureData.dragEnd,e,r)),e.gestureData.drag&&(e.gestureData.drag=void 0)};e.gestureData.dragStart={start:[r.clientX,r.clientY],distance:[0,0,0],move:[0,0,0],position:[r.clientX,r.clientY],prePosition:[r.clientX,r.clientY],direction:[0,0],distanceAll:0,type:"dragStart"},t[a[r.type]]&&"dragStart"===a[r.type]&&t[a[r.type]](e.gestureData.dragStart,e,r),document.addEventListener("mousemove",s),document.addEventListener("mouseup",n)},s=function(r){var s=function(r){requestAnimationFrame((function(){var s=r.touches[0].clientX,n=r.touches[0].clientY,d=e.gestureData.drag?s-e.gestureData.drag.position[0]:0,o=e.gestureData.drag?n-e.gestureData.drag.position[1]:0,g=s-e.gestureData.dragStart.start[0],u=n-e.gestureData.dragStart.start[1],i=Math.sqrt(Math.abs(g*g)+Math.abs(u*u)),c=Math.sqrt(Math.abs(d*d)+Math.abs(o*o));e.gestureData.drag={start:e.gestureData.dragStart.start,distance:[g,u,i],move:[d,o,c],prePosition:[e.gestureData.drag?e.gestureData.drag.position[0]:s,e.gestureData.drag?e.gestureData.drag.position[1]:n],position:[s,n],direction:[d>0?1:d<0?-1:0,o>0?1:o<0?-1:0],distanceAll:e.gestureData.drag?e.gestureData.drag.distanceAll+c:0,type:"drag"},t[a[r.type]]&&"drag"===a[r.type]&&t[a[r.type]](e.gestureData.drag,e,r)}))},n=function(r){r.cancelable&&r.preventDefault(),document.removeEventListener("touchmove",s),document.removeEventListener("touchend",n),t[a[r.type]]&&"dragEnd"===a[r.type]&&(e.gestureData.dragEnd=e.gestureData.drag?e.gestureData.drag:e.gestureData.dragStart,e.gestureData.dragEnd.type="dragEnd",t[a[r.type]](e.gestureData.dragEnd,e,r)),e.gestureData.drag&&(e.gestureData.drag=void 0)},d=r.touches[0].clientX,o=r.touches[0].clientY;e.gestureData.dragStart={start:[d,o],distance:[0,0,0],move:[0,0,0],position:[d,o],prePosition:[d,o],direction:[0,0],distanceAll:0,type:"dragStart"},t[a[r.type]]&&"dragStart"===a[r.type]&&t[a[r.type]](e.gestureData.dragStart,e,r),document.addEventListener("touchmove",s),document.addEventListener("touchend",n)};if(!1===t)return this.removeEventListener("mousedown",r),void this.removeEventListener("touchstart",s);this.addEventListener("mousedown",r,{passive:!0}),this.addEventListener("touchstart",s,{passive:!0})}}},s={};(function t(e){var a=s[e];if(void 0!==a)return a.exports;var n=s[e]={exports:{}};return r[e](n,n.exports,t),n.exports})(232),t=null===document||void 0===document?void 0:document.querySelector("table"),e=function(e){Object.keys(e).forEach((function(a){var r=null==t?void 0:t.querySelector(":scope ."+a);(Array.isArray(e[a])?e[a]:[e[a]]).forEach((function(t,e){r.querySelector(":scope .v"+(e+1)).innerHTML=String(t)}))}))},null==(a=document.querySelector("#box"))||a.gesture({dragStart:function(t,a,r){e(t)},drag:function(t,a,r){e(t)},dragEnd:function(t,a,r){e(t)}})})();
+/******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+/******/ 	var __webpack_modules__ = ([
+/* 0 */,
+/* 1 */
+/***/ (() => {
+
+
+/**
+ *
+ *
+필요값
+
+
+drag
+
+시작지점
+startX,startY
+
+시작으로부터 현재까지의 이동거리
+distanceX,distanceY,distance
+
+이전 틱과의 이동거리
+moveX,moveY,move
+
+현재 위치
+positionX,positionY
+
+이전 위치
+prePositionX,prePositionY
+
+속도 (기준 잡아야함 (ex. 초당 이동한 픽셀))
+speedX,speedY,speed
+
+이동 방향
+direction
+
+총 이동거리
+distanceAll
+
+*/
+HTMLElement.prototype.gesture = function ($event) {
+    var _this = this;
+    var eventMap = {
+        mousedown: 'dragStart',
+        touchstart: 'dragStart',
+        mousemove: 'drag',
+        touchmove: 'drag',
+        mouseup: 'dragEnd',
+        touchend: 'dragEnd',
+    };
+    var type = Object.keys($event);
+    this.gestureData = {};
+    var md = function (event) {
+        var mousemove = function (event) {
+            requestAnimationFrame(function () {
+                var clientX = event.clientX, clientY = event.clientY, moveX = event.movementX, moveY = event.movementY;
+                var distance1 = clientX - _this.gestureData.dragStart.start[0];
+                var distance2 = clientY - _this.gestureData.dragStart.start[1];
+                var distance3 = Math.sqrt(Math.abs(distance1 * distance1) + Math.abs(distance2 * distance2));
+                var move3 = Math.sqrt(Math.abs(moveX * moveX) + Math.abs(moveY * moveY));
+                _this.gestureData.drag = {
+                    start: _this.gestureData.dragStart.start,
+                    // offset      : this.gestureData.dragStart.offset,
+                    distance: [
+                        distance1,
+                        distance2,
+                        distance3
+                    ],
+                    move: [
+                        moveX,
+                        moveY,
+                        move3
+                    ],
+                    prePosition: [
+                        _this.gestureData.drag ? _this.gestureData.drag.position[0] : clientX,
+                        _this.gestureData.drag ? _this.gestureData.drag.position[1] : clientY
+                    ],
+                    position: [
+                        clientX,
+                        clientY
+                    ],
+                    direction: [
+                        moveX > 0 ? 1 : moveX < 0 ? -1 : 0,
+                        moveY > 0 ? 1 : moveY < 0 ? -1 : 0
+                    ],
+                    distanceAll: _this.gestureData.drag ? _this.gestureData.drag.distanceAll + move3 : 0,
+                    type: 'drag'
+                };
+                if ($event[eventMap[event.type]] && eventMap[event.type] === 'drag') {
+                    $event[eventMap[event.type]](_this.gestureData.drag, _this, event);
+                }
+            });
+        };
+        var mouseup = function (event) {
+            document.removeEventListener('mousemove', mousemove);
+            document.removeEventListener('mouseup', mouseup);
+            if ($event[eventMap[event.type]] && eventMap[event.type] === 'dragEnd') {
+                _this.gestureData.dragEnd = _this.gestureData.drag ? _this.gestureData.drag : _this.gestureData.dragStart;
+                _this.gestureData.dragEnd.type = 'dragEnd';
+                $event[eventMap[event.type]](_this.gestureData.dragEnd, _this, event);
+            }
+            _this.gestureData.drag && (_this.gestureData.drag = undefined);
+        };
+        _this.gestureData.dragStart = {
+            start: [event.clientX, event.clientY],
+            // offset      : [event.offsetX,event.offsetY],
+            distance: [0, 0, 0],
+            move: [0, 0, 0],
+            position: [event.clientX, event.clientY],
+            prePosition: [event.clientX, event.clientY],
+            direction: [0, 0],
+            distanceAll: 0,
+            type: 'dragStart'
+        };
+        if ($event[eventMap[event.type]] && eventMap[event.type] === 'dragStart') {
+            $event[eventMap[event.type]](_this.gestureData.dragStart, _this, event);
+        }
+        document.addEventListener('mousemove', mousemove);
+        document.addEventListener('mouseup', mouseup);
+    };
+    var td = function (event) {
+        var touchmove = function (event) {
+            requestAnimationFrame(function () {
+                var clientX = event.touches[0].clientX;
+                var clientY = event.touches[0].clientY;
+                var moveX = _this.gestureData.drag ? clientX - _this.gestureData.drag.position[0] : 0;
+                var moveY = _this.gestureData.drag ? clientY - _this.gestureData.drag.position[1] : 0;
+                var distance1 = clientX - _this.gestureData.dragStart.start[0];
+                var distance2 = clientY - _this.gestureData.dragStart.start[1];
+                var distance3 = Math.sqrt(Math.abs(distance1 * distance1) + Math.abs(distance2 * distance2));
+                var move3 = Math.sqrt(Math.abs(moveX * moveX) + Math.abs(moveY * moveY));
+                _this.gestureData.drag = {
+                    start: _this.gestureData.dragStart.start,
+                    // offset      : this.gestureData.dragStart.offset,
+                    distance: [
+                        distance1,
+                        distance2,
+                        distance3
+                    ],
+                    move: [
+                        moveX,
+                        moveY,
+                        move3
+                    ],
+                    prePosition: [
+                        _this.gestureData.drag ? _this.gestureData.drag.position[0] : clientX,
+                        _this.gestureData.drag ? _this.gestureData.drag.position[1] : clientY
+                    ],
+                    position: [
+                        clientX,
+                        clientY
+                    ],
+                    direction: [
+                        moveX > 0 ? 1 : moveX < 0 ? -1 : 0,
+                        moveY > 0 ? 1 : moveY < 0 ? -1 : 0
+                    ],
+                    distanceAll: _this.gestureData.drag ? _this.gestureData.drag.distanceAll + move3 : 0,
+                    type: 'drag'
+                };
+                if ($event[eventMap[event.type]] && eventMap[event.type] === 'drag') {
+                    $event[eventMap[event.type]](_this.gestureData.drag, _this, event);
+                }
+            });
+        };
+        var touchend = function (event) {
+            if (event.cancelable) {
+                event.preventDefault();
+            }
+            document.removeEventListener('touchmove', touchmove);
+            document.removeEventListener('touchend', touchend);
+            if ($event[eventMap[event.type]] && eventMap[event.type] === 'dragEnd') {
+                _this.gestureData.dragEnd = _this.gestureData.drag ? _this.gestureData.drag : _this.gestureData.dragStart;
+                _this.gestureData.dragEnd.type = 'dragEnd';
+                $event[eventMap[event.type]](_this.gestureData.dragEnd, _this, event);
+            }
+            _this.gestureData.drag && (_this.gestureData.drag = undefined);
+        };
+        var clientX = event.touches[0].clientX;
+        var clientY = event.touches[0].clientY;
+        _this.gestureData.dragStart = {
+            start: [clientX, clientY],
+            // offset      : [offsetX,offsetY],
+            distance: [0, 0, 0],
+            move: [0, 0, 0],
+            position: [clientX, clientY],
+            prePosition: [clientX, clientY],
+            direction: [0, 0],
+            distanceAll: 0,
+            type: 'dragStart'
+        };
+        if ($event[eventMap[event.type]] && eventMap[event.type] === 'dragStart') {
+            $event[eventMap[event.type]](_this.gestureData.dragStart, _this, event);
+        }
+        document.addEventListener('touchmove', touchmove);
+        document.addEventListener('touchend', touchend);
+    };
+    if ($event === false) {
+        this.removeEventListener('mousedown', md);
+        this.removeEventListener('touchstart', td);
+        return;
+    }
+    this.addEventListener('mousedown', md, { passive: true });
+    this.addEventListener('touchstart', td, { passive: true });
+};
+
+
+/***/ })
+/******/ 	]);
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+(() => {
+var exports = __webpack_exports__;
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+__webpack_require__(1);
+(function () {
+    var table = document === null || document === void 0 ? void 0 : document.querySelector('table');
+    var updateData = function (data) {
+        var keys = Object.keys(data);
+        keys.forEach(function (item) {
+            var row = table === null || table === void 0 ? void 0 : table.querySelector(":scope ." + item);
+            var value = Array.isArray(data[item]) ? data[item] : [data[item]];
+            value.forEach(function ($item, idx) {
+                row.querySelector(":scope .v" + (idx + 1)).innerHTML = String($item);
+            });
+            // console.log(row?.querySelector(':scope .vname'));
+        });
+    };
+    var box = document.querySelector('#box');
+    box === null || box === void 0 ? void 0 : box.gesture({
+        dragStart: function (parameter, ele, event) {
+            updateData(parameter);
+            // console.log("parameter :: ",parameter,"\nele :: ",ele,"\nevent :: ",event);
+        },
+        drag: function (parameter, ele, event) {
+            updateData(parameter);
+            // console.log("parameter :: ",parameter,"\nele :: ",ele,"\nevent :: ",event);
+        },
+        dragEnd: function (parameter, ele, event) {
+            updateData(parameter);
+            // console.log("parameter :: ",parameter,"\nele :: ",ele,"\nevent :: ",event);
+        }
+    });
+})();
+
+})();
+
+/******/ })()
+;

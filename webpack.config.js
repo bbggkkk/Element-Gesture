@@ -27,7 +27,7 @@ module.exports = {
       filename: 'main.js',
       path: path.resolve(__dirname, 'dist'),
     },
-    mode:'production',
+    mode:'none',
     watch: true,
 
   };
