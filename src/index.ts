@@ -1,6 +1,12 @@
 import './elementGesture';
 import { createGesture } from './elementGesture';
 
+declare global {
+    interface Window {
+        gesture : Array<Function>
+    }
+}
+
 (function():void{
     // const table = document?.querySelector('table');
 
@@ -17,7 +23,13 @@ import { createGesture } from './elementGesture';
     // }
 
     const box = document.querySelector('#box');
-    createGesture(box as HTMLElement, {dragStart: (e:any) => { console.log(e); }})
+    
+    const [on, off] = createGesture(box as HTMLElement, {
+        dragStart   : (r:any) => { console.log(r); },
+        drag        : (r:any) => { console.log(r.position, r.prePosition); }
+    });
+    window.gesture = [on, off];
+    on();
 
     // box?.addEventListener('touchstart', (e) => {
     //     e.preventDefault();

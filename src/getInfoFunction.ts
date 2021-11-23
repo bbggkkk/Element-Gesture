@@ -4,38 +4,138 @@ interface createGestureFunction{
 interface gestureWrap {
     [index:string] : Array<Function>
 }
+interface touchEventData {
+    start       : Array<number>;
+    move        : Array<number>;
+    position    : Array<number>;
+    prePosition : Array<number>;
+    direction   : Array<number>;
+    distance    : Array<number>;
+    distanceAll : number;
+    type        : string;
+}
 
-export const $createTouchStartFunction = (callback:Function) => {
+export const $createTouchStartFunction = (element:HTMLElement, callback?:Function, touchEventInfoFunction?:Function) => {
     //touchstart시 실행할 함수
     return (e:TouchEvent) => {
-        callback();
+        e.preventDefault();
+        const info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
+        callback && callback(info, e);
     }
 }
-export const $createMouseDownFunction = (callback:Function) => {
+export const $createMouseDownFunction = (element:HTMLElement, callback?:Function, touchEventInfoFunction?:Function) => {
     //mousedown 실행할 함수
     return (e:MouseEvent) => {
-        callback();
+        const info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
+        callback && callback(info, e);
     }
 }
-export const createGestureFunction:gestureWrap = {
-    dragStart : [$createTouchStartFunction, $createMouseDownFunction ]
+
+export const $createTouchMoveFunction = (element:HTMLElement, callback?:Function, touchEventInfoFunction?:Function) => {
+    //touchmove시 실행할 함수
+    return (e:TouchEvent) => {
+        e.preventDefault();
+        const info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
+        callback && callback(info, e);
+    }
+}
+export const $createMouseMoveFunction = (element:HTMLElement, callback?:Function, touchEventInfoFunction?:Function) => {
+    //mousemove 실행할 함수
+    return (e:MouseEvent) => {
+        const info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
+        callback && callback(info, e);
+    }
 }
 
-interface touchEventData {
-    [index:string] : number|Array<number>;
+export const $createTouchEndFunction = (element:HTMLElement, callback?:Function, touchEventInfoFunction?:Function) => {
+    //touchend시 실행할 함수
+    return (e:TouchEvent) => {
+        e.preventDefault();
+        const info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
+        callback && callback(info, e);
+    }
 }
-// export const createTouchEventInfoFunction = (event:TouchEvent) => {
-//     let touchEventData:touchEventData = {};
-//     return (event:TouchEvent) => {
-//         const clientX = event.touches[0].clientX;
-//         const clientY = event.touches[0].clientY;
-//         const moveX   = touchEventData ? clientX - touchEventData.position[0] : 0
-//         const moveY   = touchEventData ? clientY - touchEventData.position[1] : 0
-    
-//         const distance1 = clientX - touchEventData.start[0];
-//         const distance2 = clientY - touchEventData.start[1];
-//         const distance3 = Math.sqrt(Math.abs(distance1*distance1)+Math.abs(distance2*distance2));
-    
-//         const move3     = Math.sqrt(Math.abs(moveX*moveX)+Math.abs(moveY*moveY))
-//     }
-// }
+export const $createMouseUpFunction = (element:HTMLElement, callback?:Function, touchEventInfoFunction?:Function) => {
+    //mouseup 실행할 함수
+    return (e:MouseEvent) => {
+        const info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
+        callback && callback(info, e);
+    }
+}
+
+export const createGestureFunction:gestureWrap = {
+    dragStart   : [$createTouchStartFunction, $createMouseDownFunction ],
+    drag        : [$createTouchMoveFunction,  $createMouseMoveFunction ],
+    dragEnd     : [$createTouchEndFunction,   $createMouseUpFunction ]
+}
+
+export const createEventInfoFunction = (event?:any, prevData?:touchEventData) => {
+    const clientX = event ? event.type.substring(0,5) === 'mouse' ?
+                    event.clientX : event.touches[0].clientX
+                    : 0;
+    const clientY = event ? event.type.substring(0,5) === 'mouse' ?
+                    event.clientY : event.touches[0].clientY
+                    : 0;
+    const moveX   = prevData !== undefined ? clientX - prevData.position[0] : 0
+    const moveY   = prevData !== undefined ? clientY - prevData.position[1] : 0
+
+    const distance1 = prevData !== undefined ? clientX - prevData.start[0] : 0;
+    const distance2 = prevData !== undefined ? clientY - prevData.start[1] : 0;
+    const distance3 = Math.sqrt(Math.abs(distance1*distance1)+Math.abs(distance2*distance2));
+
+    const move3     = Math.sqrt(Math.abs(moveX*moveX)+Math.abs(moveY*moveY));
+
+    prevData = {
+        start       : [prevData !== undefined ? prevData.start[0] : clientX,
+                       prevData !== undefined ? prevData.start[1] : clientY],
+        move        : [moveX, moveY, move3],
+        position    : [clientX, clientY],
+        prePosition : [prevData !== undefined ? prevData.prePosition[0] : clientX,
+                        prevData !== undefined ? prevData.prePosition[1] : clientY],
+        direction   : [prevData !== undefined ? moveX>0?1:moveX<0?-1:0  : 0,
+                       prevData !== undefined ? moveY>0?1:moveY<0?-1:0  : 0],
+        distance    : [distance1, distance2, distance1],
+        distanceAll : prevData !== undefined ? prevData.distanceAll += distance3 : 0,
+        type        : event ? event.type : ''
+    }
+
+    return ($event:any) => {
+        const isStart = $event.type === 'touchstart' ||
+                        prevData!.type === '' ||
+                        $event.type === 'mousedown' ||
+                        prevData!.type === '';
+        const isReset = isStart || prevData === undefined;
+
+        const $clientX = $event ? $event.type.substring(0,5) === 'mouse' ?
+                         $event.clientX : $event.touches[0].clientX
+                         : 0;
+        const $clientY = $event ? $event.type.substring(0,5) === 'mouse' ?
+                         $event.clientY : $event.touches[0].clientY
+                         : 0;
+        const $moveX   = !isReset ? $clientX - prevData!.position[0] : 0;
+        const $moveY   = !isReset ? $clientY - prevData!.position[1] : 0;
+
+        const $distance1 = !isReset ? $clientX - prevData!.start[0] : 0;
+        const $distance2 = !isReset ? $clientY - prevData!.start[1] : 0;
+        const $distance3 = Math.sqrt(Math.abs($distance1*$distance1)+Math.abs($distance2*$distance2));
+
+        const $move3     = Math.sqrt(Math.abs($moveX*$moveX)+Math.abs($moveY*$moveY));
+
+        const thisData:touchEventData  = {
+            start       : [!isStart ? prevData!.start[0] : $clientX,
+                           !isStart ? prevData!.start[1] : $clientY],
+            move        : [$moveX, $moveY, $move3],
+            position    : [$clientX, $clientY],
+            prePosition : [isStart ? prevData!.prePosition[0] : $clientX,
+                           isStart ? prevData!.prePosition[1] : $clientY],
+            direction   : [prevData !== undefined ? $moveX>0?1:$moveX<0?-1:0  : 0,
+                           prevData !== undefined ? $moveY>0?1:$moveY<0?-1:0  : 0],
+            distance    : [$distance1, $distance2, $distance1],
+            distanceAll : prevData !== undefined ? prevData.distanceAll += $distance3 : 0,
+            type        : $event.type
+        }
+        prevData = JSON.parse(JSON.stringify(thisData));
+
+        return thisData;
+    }
+}

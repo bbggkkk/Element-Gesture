@@ -11,26 +11,44 @@ exports.createOffGesture = exports.createOnGesture = exports.createGesture = voi
 var getInfoFunction_1 = __webpack_require__(2);
 var createGesture = function (element, gesture) {
     //제스쳐 on,off 함수 반환
-    var onGesture = (0, exports.createOnGesture)(element, gesture);
-    var offGesture = (0, exports.createOffGesture)(element, gesture);
-    return [onGesture];
+    var _a = (0, exports.createOnGesture)(element, gesture), onGesture = _a[0], gestureFunction = _a[1];
+    var offGesture = (0, exports.createOffGesture)(element, gestureFunction);
+    return [onGesture, offGesture];
 };
 exports.createGesture = createGesture;
 var createOnGesture = function (element, gesture) {
     //addEventListener 해주는 함수 반환
-    var gestureKeys = Object.keys(gesture);
+    var gestureKeys = ['dragStart', 'drag', 'dragEnd'];
     var gestureFunction = gestureKeys.reduce(function (acc, item) {
-        acc[item] = [getInfoFunction_1.createGestureFunction[item][0](gesture[item]),
-            getInfoFunction_1.createGestureFunction[item][1](gesture[item])];
+        var touchEventInfoFunction = (0, getInfoFunction_1.createEventInfoFunction)();
+        acc[item] = [getInfoFunction_1.createGestureFunction[item][0](gesture[item], touchEventInfoFunction),
+            getInfoFunction_1.createGestureFunction[item][1](gesture[item], touchEventInfoFunction)];
         return acc;
     }, {});
-    console.log(gestureFunction);
-    // element.addEventListener('touchstart', );
+    return [
+        function () {
+            element.addEventListener('touchstart', gestureFunction.dragStart[0]);
+            // element.addEventListener('touchmove', gestureFunction.drag[0] as EventListenerOrEventListenerObject);
+            // element.addEventListener('touchcancel', gestureFunction.drag[0] as EventListenerOrEventListenerObject);
+            element.addEventListener('mousedown', gestureFunction.dragStart[0]);
+            // element.addEventListener('mousemove', gestureFunction.drag[0] as EventListenerOrEventListenerObject);
+            // element.addEventListener('mouseleave', gestureFunction.drag[0] as EventListenerOrEventListenerObject);
+        },
+        gestureFunction
+    ];
 };
 exports.createOnGesture = createOnGesture;
-var createOffGesture = function (element, gesture) {
+var createOffGesture = function (element, gestureFunction) {
     //removeEventListener 해주는 함수 반환
-    var gestureKeys = Object.keys(gesture);
+    var gestureKeys = ['dragStart', 'drag', 'dragEnd'];
+    return function () {
+        element.removeEventListener('touchstart', gestureFunction.dragStart[0]);
+        element.removeEventListener('touchmove', gestureFunction.dragStart[0]);
+        element.removeEventListener('touchend', gestureFunction.dragStart[0]);
+        element.removeEventListener('mousedown', gestureFunction.dragStart[0]);
+        element.removeEventListener('mousemove', gestureFunction.dragStart[0]);
+        element.removeEventListener('mouseup', gestureFunction.dragStart[0]);
+    };
 };
 exports.createOffGesture = createOffGesture;
 
@@ -41,37 +59,125 @@ exports.createOffGesture = createOffGesture;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createGestureFunction = exports.$createMouseDownFunction = exports.$createTouchStartFunction = void 0;
-var $createTouchStartFunction = function (callback) {
+exports.createEventInfoFunction = exports.createGestureFunction = exports.$createMouseUpFunction = exports.$createTouchEndFunction = exports.$createMouseMoveFunction = exports.$createTouchMoveFunction = exports.$createMouseDownFunction = exports.$createTouchStartFunction = void 0;
+var $createTouchStartFunction = function (element, callback, touchEventInfoFunction) {
     //touchstart시 실행할 함수
     return function (e) {
-        callback();
+        e.preventDefault();
+        var info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
+        callback && callback(info, e);
     };
 };
 exports.$createTouchStartFunction = $createTouchStartFunction;
-var $createMouseDownFunction = function (callback) {
+var $createMouseDownFunction = function (element, callback, touchEventInfoFunction) {
     //mousedown 실행할 함수
     return function (e) {
-        callback();
+        var info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
+        callback && callback(info, e);
     };
 };
 exports.$createMouseDownFunction = $createMouseDownFunction;
-exports.createGestureFunction = {
-    dragStart: [exports.$createTouchStartFunction, exports.$createMouseDownFunction]
+var $createTouchMoveFunction = function (element, callback, touchEventInfoFunction) {
+    //touchmove시 실행할 함수
+    return function (e) {
+        e.preventDefault();
+        var info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
+        callback && callback(info, e);
+    };
 };
-// export const createTouchEventInfoFunction = (event:TouchEvent) => {
-//     let touchEventData:touchEventData = {};
-//     return (event:TouchEvent) => {
-//         const clientX = event.touches[0].clientX;
-//         const clientY = event.touches[0].clientY;
-//         const moveX   = touchEventData ? clientX - touchEventData.position[0] : 0
-//         const moveY   = touchEventData ? clientY - touchEventData.position[1] : 0
-//         const distance1 = clientX - touchEventData.start[0];
-//         const distance2 = clientY - touchEventData.start[1];
-//         const distance3 = Math.sqrt(Math.abs(distance1*distance1)+Math.abs(distance2*distance2));
-//         const move3     = Math.sqrt(Math.abs(moveX*moveX)+Math.abs(moveY*moveY))
-//     }
-// }
+exports.$createTouchMoveFunction = $createTouchMoveFunction;
+var $createMouseMoveFunction = function (element, callback, touchEventInfoFunction) {
+    //mousemove 실행할 함수
+    return function (e) {
+        var info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
+        callback && callback(info, e);
+    };
+};
+exports.$createMouseMoveFunction = $createMouseMoveFunction;
+var $createTouchEndFunction = function (element, callback, touchEventInfoFunction) {
+    //touchend시 실행할 함수
+    return function (e) {
+        e.preventDefault();
+        var info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
+        callback && callback(info, e);
+    };
+};
+exports.$createTouchEndFunction = $createTouchEndFunction;
+var $createMouseUpFunction = function (element, callback, touchEventInfoFunction) {
+    //mouseup 실행할 함수
+    return function (e) {
+        var info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
+        callback && callback(info, e);
+    };
+};
+exports.$createMouseUpFunction = $createMouseUpFunction;
+exports.createGestureFunction = {
+    dragStart: [exports.$createTouchStartFunction, exports.$createMouseDownFunction],
+    drag: [exports.$createTouchMoveFunction, exports.$createMouseMoveFunction],
+    dragEnd: [exports.$createTouchEndFunction, exports.$createMouseUpFunction]
+};
+var createEventInfoFunction = function (event, prevData) {
+    var clientX = event ? event.type.substring(0, 5) === 'mouse' ?
+        event.clientX : event.touches[0].clientX
+        : 0;
+    var clientY = event ? event.type.substring(0, 5) === 'mouse' ?
+        event.clientY : event.touches[0].clientY
+        : 0;
+    var moveX = prevData !== undefined ? clientX - prevData.position[0] : 0;
+    var moveY = prevData !== undefined ? clientY - prevData.position[1] : 0;
+    var distance1 = prevData !== undefined ? clientX - prevData.start[0] : 0;
+    var distance2 = prevData !== undefined ? clientY - prevData.start[1] : 0;
+    var distance3 = Math.sqrt(Math.abs(distance1 * distance1) + Math.abs(distance2 * distance2));
+    var move3 = Math.sqrt(Math.abs(moveX * moveX) + Math.abs(moveY * moveY));
+    prevData = {
+        start: [prevData !== undefined ? prevData.start[0] : clientX,
+            prevData !== undefined ? prevData.start[1] : clientY],
+        move: [moveX, moveY, move3],
+        position: [clientX, clientY],
+        prePosition: [prevData !== undefined ? prevData.prePosition[0] : clientX,
+            prevData !== undefined ? prevData.prePosition[1] : clientY],
+        direction: [prevData !== undefined ? moveX > 0 ? 1 : moveX < 0 ? -1 : 0 : 0,
+            prevData !== undefined ? moveY > 0 ? 1 : moveY < 0 ? -1 : 0 : 0],
+        distance: [distance1, distance2, distance1],
+        distanceAll: prevData !== undefined ? prevData.distanceAll += distance3 : 0,
+        type: event ? event.type : ''
+    };
+    return function ($event) {
+        var isStart = $event.type === 'touchstart' ||
+            prevData.type === '' ||
+            $event.type === 'mousedown' ||
+            prevData.type === '';
+        var isReset = isStart || prevData === undefined;
+        var $clientX = $event ? $event.type.substring(0, 5) === 'mouse' ?
+            $event.clientX : $event.touches[0].clientX
+            : 0;
+        var $clientY = $event ? $event.type.substring(0, 5) === 'mouse' ?
+            $event.clientY : $event.touches[0].clientY
+            : 0;
+        var $moveX = !isReset ? $clientX - prevData.position[0] : 0;
+        var $moveY = !isReset ? $clientY - prevData.position[1] : 0;
+        var $distance1 = !isReset ? $clientX - prevData.start[0] : 0;
+        var $distance2 = !isReset ? $clientY - prevData.start[1] : 0;
+        var $distance3 = Math.sqrt(Math.abs($distance1 * $distance1) + Math.abs($distance2 * $distance2));
+        var $move3 = Math.sqrt(Math.abs($moveX * $moveX) + Math.abs($moveY * $moveY));
+        var thisData = {
+            start: [!isStart ? prevData.start[0] : $clientX,
+                !isStart ? prevData.start[1] : $clientY],
+            move: [$moveX, $moveY, $move3],
+            position: [$clientX, $clientY],
+            prePosition: [isStart ? prevData.prePosition[0] : $clientX,
+                isStart ? prevData.prePosition[1] : $clientY],
+            direction: [prevData !== undefined ? $moveX > 0 ? 1 : $moveX < 0 ? -1 : 0 : 0,
+                prevData !== undefined ? $moveY > 0 ? 1 : $moveY < 0 ? -1 : 0 : 0],
+            distance: [$distance1, $distance2, $distance1],
+            distanceAll: prevData !== undefined ? prevData.distanceAll += $distance3 : 0,
+            type: $event.type
+        };
+        prevData = JSON.parse(JSON.stringify(thisData));
+        return thisData;
+    };
+};
+exports.createEventInfoFunction = createEventInfoFunction;
 
 
 /***/ })
@@ -124,7 +230,12 @@ var elementGesture_1 = __webpack_require__(1);
     //     });
     // }
     var box = document.querySelector('#box');
-    (0, elementGesture_1.createGesture)(box, { dragStart: function (e) { console.log(e); } });
+    var _a = (0, elementGesture_1.createGesture)(box, {
+        dragStart: function (r) { console.log(r); },
+        drag: function (r) { console.log(r.position, r.prePosition); }
+    }), on = _a[0], off = _a[1];
+    window.gesture = [on, off];
+    on();
     // box?.addEventListener('touchstart', (e) => {
     //     e.preventDefault();
     //     console.log('touchstart', e);
