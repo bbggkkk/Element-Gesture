@@ -19,20 +19,20 @@ exports.createGesture = createGesture;
 var createOnGesture = function (element, gesture) {
     //addEventListener 해주는 함수 반환
     var gestureKeys = ['dragStart', 'drag', 'dragEnd'];
+    var touchEventInfoFunction = (0, getInfoFunction_1.createEventInfoFunction)();
     var gestureFunction = gestureKeys.reduce(function (acc, item) {
-        var touchEventInfoFunction = (0, getInfoFunction_1.createEventInfoFunction)();
-        acc[item] = [getInfoFunction_1.createGestureFunction[item][0](gesture[item], touchEventInfoFunction),
-            getInfoFunction_1.createGestureFunction[item][1](gesture[item], touchEventInfoFunction)];
+        acc[item] = [getInfoFunction_1.createGestureFunction[item][0](element, touchEventInfoFunction, gesture[item]),
+            getInfoFunction_1.createGestureFunction[item][1](element, touchEventInfoFunction, gesture[item])];
         return acc;
     }, {});
     return [
         function () {
-            element.addEventListener('touchstart', gestureFunction.dragStart[0]);
-            // element.addEventListener('touchmove', gestureFunction.drag[0] as EventListenerOrEventListenerObject);
-            // element.addEventListener('touchcancel', gestureFunction.drag[0] as EventListenerOrEventListenerObject);
-            element.addEventListener('mousedown', gestureFunction.dragStart[0]);
-            // element.addEventListener('mousemove', gestureFunction.drag[0] as EventListenerOrEventListenerObject);
-            // element.addEventListener('mouseleave', gestureFunction.drag[0] as EventListenerOrEventListenerObject);
+            element.addEventListener('touchstart', gestureFunction.dragStart[0], { passive: false });
+            document.addEventListener('touchmove', gestureFunction.drag[0], { passive: true });
+            document.addEventListener('touchend', gestureFunction.dragEnd[0], { passive: true });
+            element.addEventListener('mousedown', gestureFunction.dragStart[1], { passive: true });
+            document.addEventListener('mousemove', gestureFunction.drag[1], { passive: true });
+            document.addEventListener('mouseup', gestureFunction.dragEnd[1], { passive: true });
         },
         gestureFunction
     ];
@@ -43,11 +43,11 @@ var createOffGesture = function (element, gestureFunction) {
     var gestureKeys = ['dragStart', 'drag', 'dragEnd'];
     return function () {
         element.removeEventListener('touchstart', gestureFunction.dragStart[0]);
-        element.removeEventListener('touchmove', gestureFunction.dragStart[0]);
-        element.removeEventListener('touchend', gestureFunction.dragStart[0]);
-        element.removeEventListener('mousedown', gestureFunction.dragStart[0]);
-        element.removeEventListener('mousemove', gestureFunction.dragStart[0]);
-        element.removeEventListener('mouseup', gestureFunction.dragStart[0]);
+        document.removeEventListener('touchmove', gestureFunction.drag[0]);
+        document.removeEventListener('touchend', gestureFunction.dragEnd[0]);
+        element.removeEventListener('mousedown', gestureFunction.dragStart[1]);
+        document.removeEventListener('mousemove', gestureFunction.drag[1]);
+        document.removeEventListener('mouseup', gestureFunction.dragEnd[1]);
     };
 };
 exports.createOffGesture = createOffGesture;
@@ -60,54 +60,64 @@ exports.createOffGesture = createOffGesture;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createEventInfoFunction = exports.createGestureFunction = exports.$createMouseUpFunction = exports.$createTouchEndFunction = exports.$createMouseMoveFunction = exports.$createTouchMoveFunction = exports.$createMouseDownFunction = exports.$createTouchStartFunction = void 0;
-var $createTouchStartFunction = function (element, callback, touchEventInfoFunction) {
+var $createTouchStartFunction = function (element, touchEventInfoFunction, callback) {
     //touchstart시 실행할 함수
     return function (e) {
-        e.preventDefault();
-        var info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
-        callback && callback(info, e);
+        requestAnimationFrame(function () {
+            e.preventDefault();
+            var info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
+            callback && callback.call(element, info, e);
+        });
     };
 };
 exports.$createTouchStartFunction = $createTouchStartFunction;
-var $createMouseDownFunction = function (element, callback, touchEventInfoFunction) {
+var $createMouseDownFunction = function (element, touchEventInfoFunction, callback) {
     //mousedown 실행할 함수
     return function (e) {
-        var info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
-        callback && callback(info, e);
+        requestAnimationFrame(function () {
+            var info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
+            callback && callback.call(element, info, e);
+        });
     };
 };
 exports.$createMouseDownFunction = $createMouseDownFunction;
-var $createTouchMoveFunction = function (element, callback, touchEventInfoFunction) {
+var $createTouchMoveFunction = function (element, touchEventInfoFunction, callback) {
     //touchmove시 실행할 함수
     return function (e) {
-        e.preventDefault();
-        var info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
-        callback && callback(info, e);
+        requestAnimationFrame(function () {
+            var info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
+            info.isClicked && callback && callback.call(element, info, e);
+        });
     };
 };
 exports.$createTouchMoveFunction = $createTouchMoveFunction;
-var $createMouseMoveFunction = function (element, callback, touchEventInfoFunction) {
+var $createMouseMoveFunction = function (element, touchEventInfoFunction, callback) {
     //mousemove 실행할 함수
     return function (e) {
-        var info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
-        callback && callback(info, e);
+        requestAnimationFrame(function () {
+            var info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
+            info.isClicked && callback && callback.call(element, info, e);
+        });
     };
 };
 exports.$createMouseMoveFunction = $createMouseMoveFunction;
-var $createTouchEndFunction = function (element, callback, touchEventInfoFunction) {
+var $createTouchEndFunction = function (element, touchEventInfoFunction, callback) {
     //touchend시 실행할 함수
     return function (e) {
-        e.preventDefault();
-        var info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
-        callback && callback(info, e);
+        requestAnimationFrame(function () {
+            var info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
+            callback && callback.call(element, info, e);
+        });
     };
 };
 exports.$createTouchEndFunction = $createTouchEndFunction;
-var $createMouseUpFunction = function (element, callback, touchEventInfoFunction) {
+var $createMouseUpFunction = function (element, touchEventInfoFunction, callback) {
     //mouseup 실행할 함수
     return function (e) {
-        var info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
-        callback && callback(info, e);
+        requestAnimationFrame(function () {
+            var info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
+            callback && callback.call(element, info, e);
+        });
     };
 };
 exports.$createMouseUpFunction = $createMouseUpFunction;
@@ -129,6 +139,7 @@ var createEventInfoFunction = function (event, prevData) {
     var distance2 = prevData !== undefined ? clientY - prevData.start[1] : 0;
     var distance3 = Math.sqrt(Math.abs(distance1 * distance1) + Math.abs(distance2 * distance2));
     var move3 = Math.sqrt(Math.abs(moveX * moveX) + Math.abs(moveY * moveY));
+    // prevData = undefined;
     prevData = {
         start: [prevData !== undefined ? prevData.start[0] : clientX,
             prevData !== undefined ? prevData.start[1] : clientY],
@@ -140,7 +151,8 @@ var createEventInfoFunction = function (event, prevData) {
             prevData !== undefined ? moveY > 0 ? 1 : moveY < 0 ? -1 : 0 : 0],
         distance: [distance1, distance2, distance1],
         distanceAll: prevData !== undefined ? prevData.distanceAll += distance3 : 0,
-        type: event ? event.type : ''
+        type: event ? event.type : '',
+        isClicked: false
     };
     return function ($event) {
         var isStart = $event.type === 'touchstart' ||
@@ -148,11 +160,16 @@ var createEventInfoFunction = function (event, prevData) {
             $event.type === 'mousedown' ||
             prevData.type === '';
         var isReset = isStart || prevData === undefined;
+        // const isClick = prevData === undefined ? true :   
         var $clientX = $event ? $event.type.substring(0, 5) === 'mouse' ?
-            $event.clientX : $event.touches[0].clientX
+            $event.clientX :
+            $event.type === 'touchend' ? prevData.position[0] :
+                $event.touches[0].clientX
             : 0;
         var $clientY = $event ? $event.type.substring(0, 5) === 'mouse' ?
-            $event.clientY : $event.touches[0].clientY
+            $event.clientY :
+            $event.type === 'touchend' ? prevData.position[1] :
+                $event.touches[0].clientY
             : 0;
         var $moveX = !isReset ? $clientX - prevData.position[0] : 0;
         var $moveY = !isReset ? $clientY - prevData.position[1] : 0;
@@ -165,13 +182,16 @@ var createEventInfoFunction = function (event, prevData) {
                 !isStart ? prevData.start[1] : $clientY],
             move: [$moveX, $moveY, $move3],
             position: [$clientX, $clientY],
-            prePosition: [isStart ? prevData.prePosition[0] : $clientX,
-                isStart ? prevData.prePosition[1] : $clientY],
+            prePosition: [!isStart ? prevData.position[0] : $clientX,
+                !isStart ? prevData.position[1] : $clientY],
             direction: [prevData !== undefined ? $moveX > 0 ? 1 : $moveX < 0 ? -1 : 0 : 0,
                 prevData !== undefined ? $moveY > 0 ? 1 : $moveY < 0 ? -1 : 0 : 0],
             distance: [$distance1, $distance2, $distance1],
             distanceAll: prevData !== undefined ? prevData.distanceAll += $distance3 : 0,
-            type: $event.type
+            type: $event.type,
+            isClicked: $event.type === 'touchstart' || $event.type === 'mousedown' ?
+                true : $event.type === 'touchend' || $event.type === 'mouseup' ?
+                false : prevData.isClicked
         };
         prevData = JSON.parse(JSON.stringify(thisData));
         return thisData;
@@ -217,41 +237,29 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 __webpack_require__(1);
 var elementGesture_1 = __webpack_require__(1);
 (function () {
-    // const table = document?.querySelector('table');
-    // const updateData = (data:any):void => {
-    //     const keys = Object.keys(data);
-    //     keys.forEach(item => {
-    //         const row = table?.querySelector(`:scope .${item}`) as any;
-    //         const value = Array.isArray(data[item]) ? data[item] : [data[item]];
-    //         value.forEach(($item:number|string,idx:number) => {
-    //             row.querySelector(`:scope .v${idx+1}`).innerHTML = String($item);
-    //         });
-    //         // console.log(row?.querySelector(':scope .vname'));
-    //     });
-    // }
+    var table = document === null || document === void 0 ? void 0 : document.querySelector('table');
+    var updateData = function (data) {
+        var keys = Object.keys(data);
+        keys.forEach(function (item) {
+            var row = table === null || table === void 0 ? void 0 : table.querySelector(":scope ." + item);
+            var value = Array.isArray(data[item]) ? data[item] : [data[item]];
+            value.forEach(function ($item, idx) {
+                row.querySelector(":scope .v" + (idx + 1)).innerHTML = String($item);
+            });
+            // console.log(row?.querySelector(':scope .vname'));
+        });
+    };
     var box = document.querySelector('#box');
+    var test = function (e) {
+        console.log('console\n\n', "type :: " + e.type + "\n", "direction :: " + e.direction + "\n", "distance :: " + e.distance + "\n", "distanceAll :: " + e.distanceAll + "\n", "move :: " + e.move + "\n", "position :: " + e.position + "\n", "prePosition :: " + e.prePosition + "\n", "start :: " + e.start + "\n");
+    };
     var _a = (0, elementGesture_1.createGesture)(box, {
-        dragStart: function (r) { console.log(r); },
-        drag: function (r) { console.log(r.position, r.prePosition); }
+        dragStart: function (r) { updateData(r); },
+        drag: function (r) { updateData(r); },
+        dragEnd: function (r) { updateData(r); },
     }), on = _a[0], off = _a[1];
     window.gesture = [on, off];
     on();
-    // box?.addEventListener('touchstart', (e) => {
-    //     e.preventDefault();
-    //     console.log('touchstart', e);
-    // })
-    // box?.addEventListener('touchmove', (e) => {
-    //     console.log('touchmove', e);
-    // })
-    // box?.addEventListener('touchend', (e) => {
-    //     console.log('touchend', e);
-    // })
-    // box?.addEventListener('mousedown', (e) => {
-    //     console.log('mousedown');
-    // })
-    // box?.addEventListener('mousemove', (e) => {
-    //     console.log('mousemove');
-    // })
 })();
 
 })();
