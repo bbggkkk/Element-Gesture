@@ -21,9 +21,9 @@ Element-Gesture는 세가지 이벤트를 지원합니다.
 ```js
 const box = document.querySelector('#box');
 const [on, off] = createGesture(box as HTMLElement, {
-    dragStart   : (r:any, e:TouchEvent|MouseEvent) => { ... },
-    drag        : (r:any, e:TouchEvent|MouseEvent) => { ... },
-    dragEnd     : (r:any, e:TouchEvent|MouseEvent) => { ... },
+    dragStart   : (r:any, e:TouchEvent|MouseEvent, rt:any) => { ... },
+    drag        : (r:any, e:TouchEvent|MouseEvent, rt:any) => { ... },
+    dragEnd     : (r:any, e:TouchEvent|MouseEvent, rt:any) => { ... },
 });
 on();
 ```
@@ -48,6 +48,8 @@ createGesutre 함수의 인풋입니다.
 |**isClicked**|클릭상태인지 아닌지|`boolean`||
 
 콜백함수의 두번째 인자는 실제 발생한 이벤트의 객체입니다.
+
+콜백함수의 세번째 인자는 콜백함수에서 반환한 값입니다.
 
 
 ## 사용하기
