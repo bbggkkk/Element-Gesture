@@ -27,8 +27,8 @@ export const createOnGesture = (element:HTMLElement, gesture:gesture) => {
     return [
         () => {
             element.addEventListener('touchstart', gestureFunction.dragStart[0] as EventListenerOrEventListenerObject, {passive : false});
-            document.addEventListener('touchmove', gestureFunction.drag[0] as EventListenerOrEventListenerObject, {passive : true});
-            document.addEventListener('touchend', gestureFunction.dragEnd[0] as EventListenerOrEventListenerObject, {passive : true});
+            document.addEventListener('touchmove', gestureFunction.drag[0] as EventListenerOrEventListenerObject, {passive : false});
+            document.addEventListener('touchend', gestureFunction.dragEnd[0] as EventListenerOrEventListenerObject, {passive : false});
 
             element.addEventListener('mousedown', gestureFunction.dragStart[1] as EventListenerOrEventListenerObject, {passive : true});
             document.addEventListener('mousemove', gestureFunction.drag[1] as EventListenerOrEventListenerObject, {passive : true});

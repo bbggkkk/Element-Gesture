@@ -28,8 +28,8 @@ var createOnGesture = function (element, gesture) {
     return [
         function () {
             element.addEventListener('touchstart', gestureFunction.dragStart[0], { passive: false });
-            document.addEventListener('touchmove', gestureFunction.drag[0], { passive: true });
-            document.addEventListener('touchend', gestureFunction.dragEnd[0], { passive: true });
+            document.addEventListener('touchmove', gestureFunction.drag[0], { passive: false });
+            document.addEventListener('touchend', gestureFunction.dragEnd[0], { passive: false });
             element.addEventListener('mousedown', gestureFunction.dragStart[1], { passive: true });
             document.addEventListener('mousemove', gestureFunction.drag[1], { passive: true });
             document.addEventListener('mouseup', gestureFunction.dragEnd[1], { passive: true });
@@ -63,8 +63,8 @@ exports.createEventInfoFunction = exports.createGestureFunction = exports.$creat
 var $createTouchStartFunction = function (element, touchEventInfoFunction, callback) {
     //touchstart시 실행할 함수
     return function (e) {
+        e.preventDefault();
         requestAnimationFrame(function () {
-            e.preventDefault();
             var info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
             callback && callback.call(element, info, e);
         });
@@ -84,6 +84,7 @@ exports.$createMouseDownFunction = $createMouseDownFunction;
 var $createTouchMoveFunction = function (element, touchEventInfoFunction, callback) {
     //touchmove시 실행할 함수
     return function (e) {
+        e.preventDefault();
         requestAnimationFrame(function () {
             var info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
             info.isClicked && callback && callback.call(element, info, e);
@@ -104,6 +105,7 @@ exports.$createMouseMoveFunction = $createMouseMoveFunction;
 var $createTouchEndFunction = function (element, touchEventInfoFunction, callback) {
     //touchend시 실행할 함수
     return function (e) {
+        e.preventDefault();
         requestAnimationFrame(function () {
             var info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
             callback && callback.call(element, info, e);

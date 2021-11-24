@@ -20,8 +20,8 @@ interface touchEventData {
 export const $createTouchStartFunction = (element:HTMLElement, touchEventInfoFunction?:Function, callback?:Function) => {
     //touchstart시 실행할 함수
     return (e:TouchEvent) => {
+        e.preventDefault();
         requestAnimationFrame(() => {
-            e.preventDefault();
             const info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
             callback && callback.call(element, info, e);
         });
@@ -40,6 +40,7 @@ export const $createMouseDownFunction = (element:HTMLElement, touchEventInfoFunc
 export const $createTouchMoveFunction = (element:HTMLElement, touchEventInfoFunction?:Function, callback?:Function) => {
     //touchmove시 실행할 함수
     return (e:TouchEvent) => {
+        e.preventDefault();
         requestAnimationFrame(() => {
             const info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
             info.isClicked && callback && callback.call(element, info, e);
@@ -59,6 +60,7 @@ export const $createMouseMoveFunction = (element:HTMLElement, touchEventInfoFunc
 export const $createTouchEndFunction = (element:HTMLElement, touchEventInfoFunction?:Function, callback?:Function) => {
     //touchend시 실행할 함수
     return (e:TouchEvent) => {
+        e.preventDefault();
         requestAnimationFrame(() => {
             const info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
             callback && callback.call(element, info, e);
