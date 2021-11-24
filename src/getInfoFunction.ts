@@ -117,12 +117,12 @@ export const createEventInfoFunction = (event?:any, prevData?:touchEventData) =>
     }
 
     return ($event:any) => {
-        const isStart = $event.type === 'touchstart' ||
-                        prevData!.type === '' ||
-                        $event.type === 'mousedown' ||
-                        prevData!.type === '';
+        const type    = $event.type === 'touchstart' || $event.type === 'mousedown'
+                        ? 'dragStart' : $event.type === 'touchmove' || $event.type === 'mousemove'
+                        ? 'drag' : $event.type === 'touchend' || $event.type === 'mouseup'
+                        ? 'dragEnd' : '';
+        const isStart = type === 'dragStart' || prevData!.type === '';
         const isReset = isStart || prevData === undefined;
-        // const isClick = prevData === undefined ? true :   
 
         const $clientX = $event ? $event.type.substring(0,5) === 'mouse' ?
                          $event.clientX : 
@@ -155,10 +155,10 @@ export const createEventInfoFunction = (event?:any, prevData?:touchEventData) =>
                            prevData !== undefined ? $moveY>0?1:$moveY<0?-1:0  : 0],
             distance    : [$distance1, $distance2, $distance1],
             distanceAll : prevData !== undefined ? isStart ? 0 : prevData.distanceAll += $move3 : 0,
-            type        : $event.type,
+            type        : type,
 
-            isClicked   : $event.type === 'touchstart' || $event.type === 'mousedown' ?
-                          true : $event.type === 'touchend' || $event.type === 'mouseup' ?
+            isClicked   : type === 'dragStart' ?
+                          true : type === 'dragEnd' ?
                           false : prevData!.isClicked
         }
         prevData = JSON.parse(JSON.stringify(thisData));

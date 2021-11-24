@@ -157,12 +157,12 @@ var createEventInfoFunction = function (event, prevData) {
         isClicked: false
     };
     return function ($event) {
-        var isStart = $event.type === 'touchstart' ||
-            prevData.type === '' ||
-            $event.type === 'mousedown' ||
-            prevData.type === '';
+        var type = $event.type === 'touchstart' || $event.type === 'mousedown'
+            ? 'dragStart' : $event.type === 'touchmove' || $event.type === 'mousemove'
+            ? 'drag' : $event.type === 'touchend' || $event.type === 'mouseup'
+            ? 'dragEnd' : '';
+        var isStart = type === 'dragStart' || prevData.type === '';
         var isReset = isStart || prevData === undefined;
-        // const isClick = prevData === undefined ? true :   
         var $clientX = $event ? $event.type.substring(0, 5) === 'mouse' ?
             $event.clientX :
             $event.type === 'touchend' ? prevData.position[0] :
@@ -190,9 +190,9 @@ var createEventInfoFunction = function (event, prevData) {
                 prevData !== undefined ? $moveY > 0 ? 1 : $moveY < 0 ? -1 : 0 : 0],
             distance: [$distance1, $distance2, $distance1],
             distanceAll: prevData !== undefined ? isStart ? 0 : prevData.distanceAll += $move3 : 0,
-            type: $event.type,
-            isClicked: $event.type === 'touchstart' || $event.type === 'mousedown' ?
-                true : $event.type === 'touchend' || $event.type === 'mouseup' ?
+            type: type,
+            isClicked: type === 'dragStart' ?
+                true : type === 'dragEnd' ?
                 false : prevData.isClicked
         };
         prevData = JSON.parse(JSON.stringify(thisData));
