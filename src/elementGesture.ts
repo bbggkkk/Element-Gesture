@@ -1,4 +1,4 @@
-import { createGestureFunction, createEventInfoFunction } from "./getInfoFunction";
+import { createGestureFunction, createEventInfoFunction, createSendDataFunction } from "./getInfoFunction";
 
 interface gesture {
     [index:string] : Function;
@@ -18,9 +18,10 @@ export const createOnGesture = (element:HTMLElement, gesture:gesture) => {
     //addEventListener 해주는 함수 반환
     const gestureKeys = ['dragStart', 'drag', 'dragEnd'];
     const touchEventInfoFunction = createEventInfoFunction();
+    const sendDataFunction = createSendDataFunction();
     const gestureFunction:gestureWrap = gestureKeys.reduce((acc:gestureWrap, item:string) => {
-        acc[item] = [createGestureFunction[item][0](element, touchEventInfoFunction, gesture[item]),
-                     createGestureFunction[item][1](element, touchEventInfoFunction, gesture[item])];
+        acc[item] = [createGestureFunction[item][0](element, touchEventInfoFunction, sendDataFunction, gesture[item]),
+                     createGestureFunction[item][1](element, touchEventInfoFunction, sendDataFunction, gesture[item])];
         return acc;
     }, {});
 

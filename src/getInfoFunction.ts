@@ -17,62 +17,68 @@ interface touchEventData {
     isClicked   : Boolean;
 }
 
-export const $createTouchStartFunction = (element:HTMLElement, touchEventInfoFunction?:Function, callback?:Function) => {
+export const $createTouchStartFunction = (element:HTMLElement, touchEventInfoFunction?:Function, sendDataFunction?:Function, callback?:Function) => {
     //touchstart시 실행할 함수
     return (e:TouchEvent) => {
         e.preventDefault();
         requestAnimationFrame(() => {
             const info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
-            callback && callback.call(element, info, e);
+            const originData = sendDataFunction[0]();
+            callback && sendDataFunction[1](callback.call(element, info, e, originData));
         });
     }
 }
-export const $createMouseDownFunction = (element:HTMLElement, touchEventInfoFunction?:Function, callback?:Function) => {
+export const $createMouseDownFunction = (element:HTMLElement, touchEventInfoFunction?:Function, sendDataFunction?:Function, callback?:Function) => {
     //mousedown 실행할 함수
     return (e:MouseEvent) => {
         requestAnimationFrame(() => {
             const info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
-            callback && callback.call(element, info, e);
+            const originData = sendDataFunction[0]();
+            callback && sendDataFunction[1](callback.call(element, info, e, originData));
         });
     }
 }
 
-export const $createTouchMoveFunction = (element:HTMLElement, touchEventInfoFunction?:Function, callback?:Function) => {
+export const $createTouchMoveFunction = (element:HTMLElement, touchEventInfoFunction?:Function, sendDataFunction?:Function, callback?:Function) => {
     //touchmove시 실행할 함수
     return (e:TouchEvent) => {
         e.preventDefault();
         requestAnimationFrame(() => {
             const info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
-            info.isClicked && callback && callback.call(element, info, e);
+            const originData = sendDataFunction[0]();
+            info.isClicked && callback && sendDataFunction[1](callback.call(element, info, e, originData));
         });
     }
 }
-export const $createMouseMoveFunction = (element:HTMLElement, touchEventInfoFunction?:Function, callback?:Function) => {
+export const $createMouseMoveFunction = (element:HTMLElement, touchEventInfoFunction?:Function, sendDataFunction?:Function, callback?:Function) => {
     //mousemove 실행할 함수
     return (e:MouseEvent) => {
         requestAnimationFrame(() => {
             const info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
-            info.isClicked && callback && callback.call(element, info, e);
+            const originData = sendDataFunction[0]();
+            info.isClicked && callback && sendDataFunction[1](callback.call(element, info, e, originData));
         });
     }
 }
 
-export const $createTouchEndFunction = (element:HTMLElement, touchEventInfoFunction?:Function, callback?:Function) => {
+export const $createTouchEndFunction = (element:HTMLElement, touchEventInfoFunction?:Function, sendDataFunction?:Function, callback?:Function) => {
     //touchend시 실행할 함수
     return (e:TouchEvent) => {
         e.preventDefault();
         requestAnimationFrame(() => {
             const info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
-            callback && callback.call(element, info, e);
+            const originData = sendDataFunction[0]();
+            callback && sendDataFunction[1](callback.call(element, info, e, originData));
         });
     }
 }
-export const $createMouseUpFunction = (element:HTMLElement, touchEventInfoFunction?:Function, callback?:Function) => {
+export const $createMouseUpFunction = (element:HTMLElement, touchEventInfoFunction?:Function, sendDataFunction?:Function, callback?:Function) => {
     //mouseup 실행할 함수
     return (e:MouseEvent) => {
         requestAnimationFrame(() => {
             const info = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
-            callback && callback.call(element, info, e);
+            const originData = sendDataFunction[0]();
+            callback && sendDataFunction[1](callback.call(element, info, e, originData));
         });
     }
 }
@@ -83,6 +89,15 @@ export const createGestureFunction:gestureWrap = {
     dragEnd     : [$createTouchEndFunction,   $createMouseUpFunction ]
 }
 
+export const createSendDataFunction = () => {
+    let originData = undefined;
+    return [() => {
+        return originData;
+    },(data:any) => {
+        originData = data;
+        return originData;
+    }]
+}
 export const createEventInfoFunction = (event?:any, prevData?:touchEventData) => {
     const clientX = event ? event.type.substring(0,5) === 'mouse' ?
                     event.clientX : event.touches[0].clientX
