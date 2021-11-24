@@ -189,7 +189,7 @@ var createEventInfoFunction = function (event, prevData) {
             direction: [prevData !== undefined ? $moveX > 0 ? 1 : $moveX < 0 ? -1 : 0 : 0,
                 prevData !== undefined ? $moveY > 0 ? 1 : $moveY < 0 ? -1 : 0 : 0],
             distance: [$distance1, $distance2, $distance1],
-            distanceAll: prevData !== undefined ? prevData.distanceAll += $distance3 : 0,
+            distanceAll: prevData !== undefined ? isStart ? 0 : prevData.distanceAll += $move3 : 0,
             type: $event.type,
             isClicked: $event.type === 'touchstart' || $event.type === 'mousedown' ?
                 true : $event.type === 'touchend' || $event.type === 'mouseup' ?
