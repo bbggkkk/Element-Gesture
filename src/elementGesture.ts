@@ -16,23 +16,30 @@ export const createGesture = (element:HTMLElement, gesture:gesture):Array<Functi
 
 export const createOnGesture = (element:HTMLElement, gesture:gesture) => {
     //addEventListener 해주는 함수 반환
-    const gestureKeys = ['dragStart', 'drag', 'dragEnd'];
     const touchEventInfoFunction = createEventInfoFunction();
+
+    
     const sendDataFunction = createSendDataFunction();
+
+    const getDragStartFunction:Array<Function> = [
+        createGestureFunction['drag'][0](element, touchEventInfoFunction, sendDataFunction, gesture['drag']),
+        createGestureFunction['drag'][1](element, touchEventInfoFunction, sendDataFunction, gesture['drag'])
+    ]
+
+    const gestureKeys = ['dragStart', 'dragEnd'];
     const gestureFunction:gestureWrap = gestureKeys.reduce((acc:gestureWrap, item:string) => {
-        acc[item] = [createGestureFunction[item][0](element, touchEventInfoFunction, sendDataFunction, gesture[item]),
-                     createGestureFunction[item][1](element, touchEventInfoFunction, sendDataFunction, gesture[item])];
+        acc[item] = [createGestureFunction[item][0](element, touchEventInfoFunction, sendDataFunction, getDragStartFunction, gesture[item]),
+                     createGestureFunction[item][1](element, touchEventInfoFunction, sendDataFunction, getDragStartFunction, gesture[item])];
         return acc;
     }, {});
+
 
     return [
         () => {
             element.addEventListener('touchstart', gestureFunction.dragStart[0] as EventListenerOrEventListenerObject, {passive : false});
-            document.addEventListener('touchmove', gestureFunction.drag[0] as EventListenerOrEventListenerObject, {passive : false});
             document.addEventListener('touchend', gestureFunction.dragEnd[0] as EventListenerOrEventListenerObject, {passive : false});
 
             element.addEventListener('mousedown', gestureFunction.dragStart[1] as EventListenerOrEventListenerObject, {passive : true});
-            document.addEventListener('mousemove', gestureFunction.drag[1] as EventListenerOrEventListenerObject, {passive : true});
             document.addEventListener('mouseup', gestureFunction.dragEnd[1] as EventListenerOrEventListenerObject, {passive : true});
         },
         gestureFunction
@@ -44,11 +51,9 @@ export const createOffGesture = (element:HTMLElement, gestureFunction:gestureWra
     const gestureKeys = ['dragStart', 'drag', 'dragEnd'];
     return () => {
             element.removeEventListener('touchstart', gestureFunction.dragStart[0] as EventListenerOrEventListenerObject);
-            document.removeEventListener('touchmove', gestureFunction.drag[0] as EventListenerOrEventListenerObject);
             document.removeEventListener('touchend', gestureFunction.dragEnd[0] as EventListenerOrEventListenerObject);
 
             element.removeEventListener('mousedown', gestureFunction.dragStart[1] as EventListenerOrEventListenerObject);
-            document.removeEventListener('mousemove', gestureFunction.drag[1] as EventListenerOrEventListenerObject);
             document.removeEventListener('mouseup', gestureFunction.dragEnd[1] as EventListenerOrEventListenerObject);
     };
 }

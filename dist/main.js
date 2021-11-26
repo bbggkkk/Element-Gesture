@@ -18,21 +18,23 @@ var createGesture = function (element, gesture) {
 exports.createGesture = createGesture;
 var createOnGesture = function (element, gesture) {
     //addEventListener 해주는 함수 반환
-    var gestureKeys = ['dragStart', 'drag', 'dragEnd'];
     var touchEventInfoFunction = (0, getInfoFunction_1.createEventInfoFunction)();
     var sendDataFunction = (0, getInfoFunction_1.createSendDataFunction)();
+    var getDragStartFunction = [
+        getInfoFunction_1.createGestureFunction['drag'][0](element, touchEventInfoFunction, sendDataFunction, gesture['drag']),
+        getInfoFunction_1.createGestureFunction['drag'][1](element, touchEventInfoFunction, sendDataFunction, gesture['drag'])
+    ];
+    var gestureKeys = ['dragStart', 'dragEnd'];
     var gestureFunction = gestureKeys.reduce(function (acc, item) {
-        acc[item] = [getInfoFunction_1.createGestureFunction[item][0](element, touchEventInfoFunction, sendDataFunction, gesture[item]),
-            getInfoFunction_1.createGestureFunction[item][1](element, touchEventInfoFunction, sendDataFunction, gesture[item])];
+        acc[item] = [getInfoFunction_1.createGestureFunction[item][0](element, touchEventInfoFunction, sendDataFunction, getDragStartFunction, gesture[item]),
+            getInfoFunction_1.createGestureFunction[item][1](element, touchEventInfoFunction, sendDataFunction, getDragStartFunction, gesture[item])];
         return acc;
     }, {});
     return [
         function () {
             element.addEventListener('touchstart', gestureFunction.dragStart[0], { passive: false });
-            document.addEventListener('touchmove', gestureFunction.drag[0], { passive: false });
             document.addEventListener('touchend', gestureFunction.dragEnd[0], { passive: false });
             element.addEventListener('mousedown', gestureFunction.dragStart[1], { passive: true });
-            document.addEventListener('mousemove', gestureFunction.drag[1], { passive: true });
             document.addEventListener('mouseup', gestureFunction.dragEnd[1], { passive: true });
         },
         gestureFunction
@@ -44,10 +46,8 @@ var createOffGesture = function (element, gestureFunction) {
     var gestureKeys = ['dragStart', 'drag', 'dragEnd'];
     return function () {
         element.removeEventListener('touchstart', gestureFunction.dragStart[0]);
-        document.removeEventListener('touchmove', gestureFunction.drag[0]);
         document.removeEventListener('touchend', gestureFunction.dragEnd[0]);
         element.removeEventListener('mousedown', gestureFunction.dragStart[1]);
-        document.removeEventListener('mousemove', gestureFunction.drag[1]);
         document.removeEventListener('mouseup', gestureFunction.dragEnd[1]);
     };
 };
@@ -97,8 +97,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createEventInfoFunction = exports.createSendDataFunction = exports.createGestureFunction = exports.$createMouseUpFunction = exports.$createTouchEndFunction = exports.$createMouseMoveFunction = exports.$createTouchMoveFunction = exports.$createMouseDownFunction = exports.$createTouchStartFunction = void 0;
-var $createTouchStartFunction = function (element, touchEventInfoFunction, sendDataFunction, callback) {
+var $createTouchStartFunction = function (element, touchEventInfoFunction, sendDataFunction, gestureFunction, callback) {
     //touchstart시 실행할 함수
+    document.addEventListener('touchmove', gestureFunction[0], { passive: false });
     return function (e) {
         e.preventDefault();
         requestAnimationFrame(function () { return __awaiter(void 0, void 0, void 0, function () {
@@ -124,8 +125,9 @@ var $createTouchStartFunction = function (element, touchEventInfoFunction, sendD
     };
 };
 exports.$createTouchStartFunction = $createTouchStartFunction;
-var $createMouseDownFunction = function (element, touchEventInfoFunction, sendDataFunction, callback) {
+var $createMouseDownFunction = function (element, touchEventInfoFunction, sendDataFunction, gestureFunction, callback) {
     //mousedown 실행할 함수
+    document.addEventListener('mousemove', gestureFunction[1], { passive: true });
     return function (e) {
         requestAnimationFrame(function () { return __awaiter(void 0, void 0, void 0, function () {
             var _a, info, bf, originData, _b, _c, _d;
@@ -203,8 +205,9 @@ var $createMouseMoveFunction = function (element, touchEventInfoFunction, sendDa
     };
 };
 exports.$createMouseMoveFunction = $createMouseMoveFunction;
-var $createTouchEndFunction = function (element, touchEventInfoFunction, sendDataFunction, callback) {
+var $createTouchEndFunction = function (element, touchEventInfoFunction, sendDataFunction, gestureFunction, callback) {
     //touchend시 실행할 함수
+    document.removeEventListener('touchend', gestureFunction[0]);
     return function (e) {
         e.preventDefault();
         requestAnimationFrame(function () { return __awaiter(void 0, void 0, void 0, function () {
@@ -230,8 +233,9 @@ var $createTouchEndFunction = function (element, touchEventInfoFunction, sendDat
     };
 };
 exports.$createTouchEndFunction = $createTouchEndFunction;
-var $createMouseUpFunction = function (element, touchEventInfoFunction, sendDataFunction, callback) {
+var $createMouseUpFunction = function (element, touchEventInfoFunction, sendDataFunction, gestureFunction, callback) {
     //mouseup 실행할 함수
+    document.removeEventListener('mouseup', gestureFunction[1]);
     return function (e) {
         requestAnimationFrame(function () { return __awaiter(void 0, void 0, void 0, function () {
             var _a, info, bf, originData, _b, _c, _d;
