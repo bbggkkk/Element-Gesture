@@ -11,8 +11,8 @@ exports.createOffGesture = exports.createOnGesture = exports.createGesture = voi
 var getInfoFunction_1 = __webpack_require__(2);
 var createGesture = function (element, gesture) {
     //제스쳐 on,off 함수 반환
-    var _a = (0, exports.createOnGesture)(element, gesture), onGesture = _a[0], gestureFunction = _a[1];
-    var offGesture = (0, exports.createOffGesture)(element, gestureFunction);
+    var _a = (0, exports.createOnGesture)(element, gesture), onGesture = _a[0], getDragStartFunction = _a[1];
+    var offGesture = (0, exports.createOffGesture)(element, getDragStartFunction);
     return [onGesture, offGesture];
 };
 exports.createGesture = createGesture;
@@ -20,35 +20,32 @@ var createOnGesture = function (element, gesture) {
     //addEventListener 해주는 함수 반환
     var touchEventInfoFunction = (0, getInfoFunction_1.createEventInfoFunction)();
     var sendDataFunction = (0, getInfoFunction_1.createSendDataFunction)();
-    var getDragStartFunction = [
+    var getDragFunction = [
         getInfoFunction_1.createGestureFunction['drag'][0](element, touchEventInfoFunction, sendDataFunction, gesture['drag']),
         getInfoFunction_1.createGestureFunction['drag'][1](element, touchEventInfoFunction, sendDataFunction, gesture['drag'])
     ];
-    var gestureKeys = ['dragStart', 'dragEnd'];
-    var gestureFunction = gestureKeys.reduce(function (acc, item) {
-        acc[item] = [getInfoFunction_1.createGestureFunction[item][0](element, touchEventInfoFunction, sendDataFunction, getDragStartFunction, gesture[item]),
-            getInfoFunction_1.createGestureFunction[item][1](element, touchEventInfoFunction, sendDataFunction, getDragStartFunction, gesture[item])];
-        return acc;
-    }, {});
+    var getDragEndFunction = [
+        getInfoFunction_1.createGestureFunction['dragEnd'][0](element, touchEventInfoFunction, sendDataFunction, getDragFunction, gesture['dragEnd']),
+        getInfoFunction_1.createGestureFunction['dragEnd'][1](element, touchEventInfoFunction, sendDataFunction, getDragFunction, gesture['dragEnd'])
+    ];
+    var getDragStartFunction = [
+        getInfoFunction_1.createGestureFunction['dragStart'][0](element, touchEventInfoFunction, sendDataFunction, getDragFunction, getDragEndFunction, gesture['dragStart']),
+        getInfoFunction_1.createGestureFunction['dragStart'][1](element, touchEventInfoFunction, sendDataFunction, getDragFunction, getDragEndFunction, gesture['dragStart'])
+    ];
     return [
         function () {
-            element.addEventListener('touchstart', gestureFunction.dragStart[0], { passive: false });
-            document.addEventListener('touchend', gestureFunction.dragEnd[0], { passive: false });
-            element.addEventListener('mousedown', gestureFunction.dragStart[1], { passive: true });
-            document.addEventListener('mouseup', gestureFunction.dragEnd[1], { passive: true });
+            element.addEventListener('touchstart', getDragStartFunction[0], { passive: false });
+            element.addEventListener('mousedown', getDragStartFunction[1], { passive: true });
         },
-        gestureFunction
+        getDragStartFunction
     ];
 };
 exports.createOnGesture = createOnGesture;
 var createOffGesture = function (element, gestureFunction) {
     //removeEventListener 해주는 함수 반환
-    var gestureKeys = ['dragStart', 'drag', 'dragEnd'];
     return function () {
-        element.removeEventListener('touchstart', gestureFunction.dragStart[0]);
-        document.removeEventListener('touchend', gestureFunction.dragEnd[0]);
-        element.removeEventListener('mousedown', gestureFunction.dragStart[1]);
-        document.removeEventListener('mouseup', gestureFunction.dragEnd[1]);
+        element.removeEventListener('touchstart', gestureFunction[0]);
+        element.removeEventListener('mousedown', gestureFunction[1]);
     };
 };
 exports.createOffGesture = createOffGesture;
@@ -97,11 +94,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createEventInfoFunction = exports.createSendDataFunction = exports.createGestureFunction = exports.$createMouseUpFunction = exports.$createTouchEndFunction = exports.$createMouseMoveFunction = exports.$createTouchMoveFunction = exports.$createMouseDownFunction = exports.$createTouchStartFunction = void 0;
-var $createTouchStartFunction = function (element, touchEventInfoFunction, sendDataFunction, gestureFunction, callback) {
+var $createTouchStartFunction = function (element, touchEventInfoFunction, sendDataFunction, dragFunction, dragEndFunction, callback) {
     //touchstart시 실행할 함수
-    document.addEventListener('touchmove', gestureFunction[0], { passive: false });
     return function (e) {
         e.preventDefault();
+        document.addEventListener('touchmove', dragFunction[0], { passive: false });
+        document.addEventListener('touchend', dragEndFunction[0], { passive: false });
         requestAnimationFrame(function () { return __awaiter(void 0, void 0, void 0, function () {
             var _a, info, bf, originData, _b, _c, _d;
             return __generator(this, function (_e) {
@@ -125,10 +123,11 @@ var $createTouchStartFunction = function (element, touchEventInfoFunction, sendD
     };
 };
 exports.$createTouchStartFunction = $createTouchStartFunction;
-var $createMouseDownFunction = function (element, touchEventInfoFunction, sendDataFunction, gestureFunction, callback) {
+var $createMouseDownFunction = function (element, touchEventInfoFunction, sendDataFunction, dragFunction, dragEndFunction, callback) {
     //mousedown 실행할 함수
-    document.addEventListener('mousemove', gestureFunction[1], { passive: true });
     return function (e) {
+        document.addEventListener('mousemove', dragFunction[1], { passive: true });
+        document.addEventListener('mouseup', dragEndFunction[1], { passive: true });
         requestAnimationFrame(function () { return __awaiter(void 0, void 0, void 0, function () {
             var _a, info, bf, originData, _b, _c, _d;
             return __generator(this, function (_e) {
@@ -205,11 +204,12 @@ var $createMouseMoveFunction = function (element, touchEventInfoFunction, sendDa
     };
 };
 exports.$createMouseMoveFunction = $createMouseMoveFunction;
-var $createTouchEndFunction = function (element, touchEventInfoFunction, sendDataFunction, gestureFunction, callback) {
+var $createTouchEndFunction = function (element, touchEventInfoFunction, sendDataFunction, dragFunction, callback) {
     //touchend시 실행할 함수
-    document.removeEventListener('touchend', gestureFunction[0]);
-    return function (e) {
+    var rtFunction = function (e) {
         e.preventDefault();
+        document.removeEventListener('touchend', dragFunction[0]);
+        document.removeEventListener('touchend', rtFunction);
         requestAnimationFrame(function () { return __awaiter(void 0, void 0, void 0, function () {
             var _a, info, bf, originData, _b, _c, _d;
             return __generator(this, function (_e) {
@@ -231,12 +231,14 @@ var $createTouchEndFunction = function (element, touchEventInfoFunction, sendDat
             });
         }); });
     };
+    return rtFunction;
 };
 exports.$createTouchEndFunction = $createTouchEndFunction;
-var $createMouseUpFunction = function (element, touchEventInfoFunction, sendDataFunction, gestureFunction, callback) {
+var $createMouseUpFunction = function (element, touchEventInfoFunction, sendDataFunction, dragFunction, callback) {
     //mouseup 실행할 함수
-    document.removeEventListener('mouseup', gestureFunction[1]);
-    return function (e) {
+    var rtFunction = function (e) {
+        document.removeEventListener('mouseup', dragFunction[1]);
+        document.removeEventListener('mouseup', rtFunction);
         requestAnimationFrame(function () { return __awaiter(void 0, void 0, void 0, function () {
             var _a, info, bf, originData, _b, _c, _d;
             return __generator(this, function (_e) {
@@ -258,6 +260,7 @@ var $createMouseUpFunction = function (element, touchEventInfoFunction, sendData
             });
         }); });
     };
+    return rtFunction;
 };
 exports.$createMouseUpFunction = $createMouseUpFunction;
 exports.createGestureFunction = {

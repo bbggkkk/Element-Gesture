@@ -9,8 +9,8 @@ interface gestureWrap {
 
 export const createGesture = (element:HTMLElement, gesture:gesture):Array<Function> => {
     //제스쳐 on,off 함수 반환
-    const [onGesture, gestureFunction] = createOnGesture(element, gesture);
-    const offGesture = createOffGesture(element, gestureFunction as gestureWrap);
+    const [onGesture, getDragStartFunction] = createOnGesture(element, gesture);
+    const offGesture = createOffGesture(element, getDragStartFunction as Array<Function>);
     return [onGesture as Function, offGesture as Function];
 }
 
@@ -21,39 +21,36 @@ export const createOnGesture = (element:HTMLElement, gesture:gesture) => {
     
     const sendDataFunction = createSendDataFunction();
 
-    const getDragStartFunction:Array<Function> = [
+    const getDragFunction:Array<Function> = [
         createGestureFunction['drag'][0](element, touchEventInfoFunction, sendDataFunction, gesture['drag']),
         createGestureFunction['drag'][1](element, touchEventInfoFunction, sendDataFunction, gesture['drag'])
-    ]
+    ];
 
-    const gestureKeys = ['dragStart', 'dragEnd'];
-    const gestureFunction:gestureWrap = gestureKeys.reduce((acc:gestureWrap, item:string) => {
-        acc[item] = [createGestureFunction[item][0](element, touchEventInfoFunction, sendDataFunction, getDragStartFunction, gesture[item]),
-                     createGestureFunction[item][1](element, touchEventInfoFunction, sendDataFunction, getDragStartFunction, gesture[item])];
-        return acc;
-    }, {});
-
+    const getDragEndFunction:Array<Function> = [
+        createGestureFunction['dragEnd'][0](element, touchEventInfoFunction, sendDataFunction, getDragFunction, gesture['dragEnd']),
+        createGestureFunction['dragEnd'][1](element, touchEventInfoFunction, sendDataFunction, getDragFunction, gesture['dragEnd'])
+    ];
+    
+    const getDragStartFunction:Array<Function> = [
+        createGestureFunction['dragStart'][0](element, touchEventInfoFunction, sendDataFunction, getDragFunction, getDragEndFunction, gesture['dragStart']),
+        createGestureFunction['dragStart'][1](element, touchEventInfoFunction, sendDataFunction, getDragFunction, getDragEndFunction, gesture['dragStart'])
+    ];
 
     return [
         () => {
-            element.addEventListener('touchstart', gestureFunction.dragStart[0] as EventListenerOrEventListenerObject, {passive : false});
-            document.addEventListener('touchend', gestureFunction.dragEnd[0] as EventListenerOrEventListenerObject, {passive : false});
+            element.addEventListener('touchstart', getDragStartFunction[0] as EventListenerOrEventListenerObject, {passive : false});
 
-            element.addEventListener('mousedown', gestureFunction.dragStart[1] as EventListenerOrEventListenerObject, {passive : true});
-            document.addEventListener('mouseup', gestureFunction.dragEnd[1] as EventListenerOrEventListenerObject, {passive : true});
+            element.addEventListener('mousedown', getDragStartFunction[1] as EventListenerOrEventListenerObject, {passive : true});
         },
-        gestureFunction
+        getDragStartFunction
     ];
 
 }
-export const createOffGesture = (element:HTMLElement, gestureFunction:gestureWrap) => {
+export const createOffGesture = (element:HTMLElement, gestureFunction:Array<Function>) => {
     //removeEventListener 해주는 함수 반환
-    const gestureKeys = ['dragStart', 'drag', 'dragEnd'];
     return () => {
-            element.removeEventListener('touchstart', gestureFunction.dragStart[0] as EventListenerOrEventListenerObject);
-            document.removeEventListener('touchend', gestureFunction.dragEnd[0] as EventListenerOrEventListenerObject);
+            element.removeEventListener('touchstart', gestureFunction[0] as EventListenerOrEventListenerObject);
 
-            element.removeEventListener('mousedown', gestureFunction.dragStart[1] as EventListenerOrEventListenerObject);
-            document.removeEventListener('mouseup', gestureFunction.dragEnd[1] as EventListenerOrEventListenerObject);
+            element.removeEventListener('mousedown', gestureFunction[1] as EventListenerOrEventListenerObject);
     };
 }
