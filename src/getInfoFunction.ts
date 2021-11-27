@@ -69,7 +69,7 @@ export const $createTouchEndFunction = (element:HTMLElement, touchEventInfoFunct
     //touchend시 실행할 함수
     const rtFunction = (e:TouchEvent) => {
         e.preventDefault();
-        document.removeEventListener('touchend', dragFunction[0] as EventListenerOrEventListenerObject);
+        document.removeEventListener('touchmove', dragFunction[0] as EventListenerOrEventListenerObject);
         document.removeEventListener('touchend', rtFunction as EventListenerOrEventListenerObject);
         requestAnimationFrame(async () => {
             const [info, bf] = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
@@ -82,7 +82,7 @@ export const $createTouchEndFunction = (element:HTMLElement, touchEventInfoFunct
 export const $createMouseUpFunction = (element:HTMLElement, touchEventInfoFunction:Function, sendDataFunction:Array<Function>, dragFunction:Array<Function>, callback?:Function) => {
     //mouseup 실행할 함수
     const rtFunction = (e:MouseEvent) => {
-        document.removeEventListener('mouseup', dragFunction[1] as EventListenerOrEventListenerObject);
+        document.removeEventListener('mousemove', dragFunction[1] as EventListenerOrEventListenerObject);
         document.removeEventListener('mouseup', rtFunction as EventListenerOrEventListenerObject);
         requestAnimationFrame(async () => {
             const [info, bf] = touchEventInfoFunction ? touchEventInfoFunction(e) : '';
@@ -177,8 +177,10 @@ export const createEventInfoFunction = (event?:any, prevData?:touchEventData) =>
             position    : [$clientX, $clientY],
             prePosition : [!isStart ? prevData!.position[0] : $clientX,
                            !isStart ? prevData!.position[1] : $clientY],
-            direction   : [prevData !== undefined ? $moveX>0?1:$moveX<0?-1:0  : 0,
-                           prevData !== undefined ? $moveY>0?1:$moveY<0?-1:0  : 0],
+            direction   : type !== 'dragEnd' ?
+                           [prevData !== undefined ? $moveX>0?1:$moveX<0?-1:0  : 0,
+                            prevData !== undefined ? $moveY>0?1:$moveY<0?-1:0  : 0] :
+                           [prevData!.direction[0], prevData!.direction[1]],
             distance    : [$distance1, $distance2, $distance1],
             distanceAll : prevData !== undefined ? isStart ? 0 : prevData.distanceAll += $move3 : 0,
             type        : type,
@@ -188,6 +190,7 @@ export const createEventInfoFunction = (event?:any, prevData?:touchEventData) =>
                           false : prevData!.isClicked
         }
         prevData = JSON.parse(JSON.stringify(thisData));
+
 
         return [thisData, before];
     }
